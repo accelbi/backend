@@ -143,16 +143,35 @@ export async function addBySuper(req, res) {
   const { data2 } = req.body;
   databaseconnect()
     .then(async () => {
-
+      if (position === "employee") {
+      const response = await dbSuper.collection("manager").findOne({ code: data2.manCode });
+         if (response){
+         await dbSuper.collection(`${position}`).insertOne(data2);
+         } else {
+            res.status(200).json({
+              error : "Manager not found"
+            })
+         }
+      } else if (position === "manager") {
       await dbSuper.collection(`${position}`).insertOne(data2);
-      data2.position = "manager";
-      await dbUser.collection("data").insertOne(data2);
+      }
 
-      res.send("addedToSuperAndUser");
+      res.send("addedToSuper");
     })
     .catch(console.error);
 }
 
+export async function managerAccount(req, res) {
+  const { data2 } = req.body;
+  console.log(data2);
+  databaseconnect()
+    .then(async () => {
+      data2.position = "manager";
+      await dbUser.collection("data").insertOne(data2);
+      res.send("managerAcountAdded");
+    })
+    .catch(console.error);
+}
 
 export async function applyLeave(req, res) {
   const { code, weekToBeDisplayed } = req.params;
