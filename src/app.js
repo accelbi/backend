@@ -7,7 +7,7 @@ import fetchDataRoute from "./router/fetchDataRoute.js";
 import updateDataRoute from "./router/updateDataRoute.js";
 import userDataRoute from "./router/userDataRoute.js";
 
-const credentials = JSON.parse(fs.readFileSync("./src/credentials.json"));
+const credentials = JSON.parse(fs.readFileSync("./credentials.json"));
 admin.initializeApp({
   credential: admin.credential.cert(credentials),
 });
