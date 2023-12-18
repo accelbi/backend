@@ -21,8 +21,8 @@ function getThisWeekDatesArray(mondayDate) {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
       const year = currentDate.getFullYear();
-      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-      const day = String(currentDate.getDate()).padStart(2, '0');
+      const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+      const day = String(currentDate.getDate()).padStart(2, "0");
       const formattedDate = `${year}-${month}-${day}`;
       datesArray.push(formattedDate);
     }
@@ -49,6 +49,114 @@ export async function manReview(req,res){
     }).catch(console.error);
     
 }
+
+export async function getGeneralData(req,res){
+    const { dates , manCode} = req.body;
+    console.log(dates);
+    let response2 = [];
+    let response3 = [];
+    databaseconnect().then(async() => {
+        const responses = await Promise.all(
+          dates.map(async (day) => {
+              let temp2 = getThisWeekDatesArray(day)
+              let res = []
+              let response = await Promise.all(
+                temp2.map(async (day) => {
+                  const response = await dbMan.collection("empTSreq").find({
+                    manCode: manCode,
+                    subDate: day,
+                  }
+                  ).toArray();
+                  res.push(...response);
+                })
+
+              );
+              response = res ;
+              response3.push(day);
+              response = response.map((item) => {
+                return {
+                  "Name":item ? item.name : "",
+                  "Emp_Id":item ? item.code : "",
+                  "Type":item ? item.type : "",
+                  "Total_Hours":item ? item.totalHours : "",
+                  "Total_Projects":item ? item.projects : "",
+                  "Total_Tasks":item ? item.tasks : "",
+                  "Leaves_Availed":item ? item.leave : "",
+                };
+              })
+              response2.push((response.length !== 0) ? response : [{
+                "Name":"",
+                "Emp_Id":"",
+                "Type":"",
+                "Total_Hours":"",
+                "Total_Projects":"",
+                "Total_Tasks":"",
+                "Leaves_Availed":"",
+              
+              }]);
+            })
+          );
+        res.json({data:response2 , dates:response3});
+    }).catch(console.error);
+}
+
+
+export async function getSpecificData(req,res){
+    const { dates , manCode , code} = req.body;
+    console.log(dates);
+    console.log(manCode);
+    console.log(code);
+    let response2 = [];
+    let response3 = [];
+    databaseconnect().then(async() => {
+        const responses = await Promise.all(
+          dates.map(async (day) => {
+              let temp2 = getThisWeekDatesArray(day)
+              let res = []
+              let response = await Promise.all(
+                temp2.map(async (day) => {
+                  const response = await dbMan.collection("empTSreq").find({
+                    manCode: manCode,
+                    subDate: day,
+                    code : code,
+                  }
+                  ).toArray();
+                  res.push(...response);
+                })
+
+              );
+              response = res ;
+              response3.push(day);
+              response = response.map((item) => {
+                return {
+                  "Name":item ? item.name : "",
+                  "Emp_Id":item ? item.code : "",
+                  "Type":item ? item.type : "",
+                  "Total_Hours":item ? item.totalHours : "",
+                  "Total_Projects":item ? item.projects : "",
+                  "Total_Tasks":item ? item.tasks : "",
+                  "Leaves_Availed":item ? item.leave : "",
+                };
+              })
+              response2.push((response.length !== 0) ? response : [{
+                "Name":"",
+                "Emp_Id":"",
+                "Type":"",
+                "Total_Hours":"",
+                "Total_Projects":"",
+                "Total_Tasks":"",
+                "Leaves_Availed":"",
+              
+              }]);
+            })
+          );
+        console.log(response2);
+        res.json({data:response2 , dates:response3});
+    }).catch(console.error);
+}
+
+
+
 export async function manDisplayReview(req,res){
     const { code , MonDate } = req.params;
     databaseconnect().then(async() => {
@@ -81,9 +189,9 @@ export async function manDisplayReview(req,res){
 export async function superVerification(req,res){
     const { code , email , manCode } = req.query;
     console.log(req.query);
-    console.log(code);
-    console.log(email);
-    console.log(manCode);
+    console.log( "code" , code);
+    console.log("email" , email);
+    console.log("manCode" , manCode);
     databaseconnect().then(async() => {
         const response = await dbSuper.collection("employee").findOne({
             code,

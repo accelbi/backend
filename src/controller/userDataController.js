@@ -36,7 +36,7 @@ export async function codeSpecific(req, res) {
   });
 }
 export async function savingEmployeeData(req, res) {
-  const { email , manCode , name , code } = req.body;
+  const { email , manCode , name , code , image_b , image_m , image_s } = req.body;
   databaseconnect().then(async () => {
     
     const response = await dbSuper.collection("manager").findOne({ code : manCode.toString() });
@@ -51,6 +51,9 @@ export async function savingEmployeeData(req, res) {
       manName: response.name,
       position: "employee",
       manEmail: response.email,
+      image_b : image_b,
+      image_m : image_m,
+      image_s : image_s,
     };
     console.log("savingEmployeeData",data);
     await dbUser.collection("data").insertOne(data);
@@ -77,13 +80,12 @@ export async function addNameToSuper(req, res) {
 }
 
 export async function checkWhetherExist(req, res) {
-  const { email , manCode , name , code } = req.body;
+  const { email , manCode , code } = req.body;
   databaseconnect().then(async () => {
     const data = {
       manCode,
       email,
-      code,
-      position: "employee",
+      empCode:code
     };
     const response = await dbUser.collection("data").findOne(data);
     console.log("checkWhetherExist",response)
@@ -92,6 +94,20 @@ export async function checkWhetherExist(req, res) {
     } else {
       res.json(false);
     }
+  });
+}
+export async function checkWhetherManagerExist(req, res) {
+  const {  manCode } = req.body;
+  databaseconnect().then(async () => {
+    
+    const response = await dbSuper.collection("manager").findOne( { code:manCode } );
+    
+    if (response){
+      res.json(true);
+    } else {
+      res.json(false);
+    }
+
   });
 }
 

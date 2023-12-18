@@ -471,7 +471,7 @@ export async function addManToManBySuper(req, res) {
           },
         });
       } else {
-        res.status(400).json({
+        res.status(200).json({
           error : "Manager not found"
         })
       }

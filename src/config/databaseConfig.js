@@ -28,3 +28,5 @@ const databaseconnect = async () => {
 
 
 export { dbEmp , dbMan , dbSuper , dbUser , databaseconnect};
+
+

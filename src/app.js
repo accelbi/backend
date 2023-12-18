@@ -1,13 +1,13 @@
 import express from "express";
 import cors from "cors";
-import fs from "fs";
 import admin from "firebase-admin";
 import authRoute from "./router/authRoute.js";
 import fetchDataRoute from "./router/fetchDataRoute.js";
 import updateDataRoute from "./router/updateDataRoute.js";
 import userDataRoute from "./router/userDataRoute.js";
+import credentials from "../credentials.json" assert { type: "json" };
 
-const credentials = JSON.parse(fs.readFileSync("./credentials.json"));
+
 admin.initializeApp({
   credential: admin.credential.cert(credentials),
 });
