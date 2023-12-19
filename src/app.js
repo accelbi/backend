@@ -5,8 +5,9 @@ import authRoute from "./router/authRoute.js";
 import fetchDataRoute from "./router/fetchDataRoute.js";
 import updateDataRoute from "./router/updateDataRoute.js";
 import userDataRoute from "./router/userDataRoute.js";
-import credentials from "../credentials.json" assert { type: "json" };
+import { readFileSync } from 'fs';
 
+const credentials = JSON.parse(readFileSync('./credentials.json', 'utf8'));
 
 admin.initializeApp({
   credential: admin.credential.cert(credentials),
