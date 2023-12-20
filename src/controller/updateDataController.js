@@ -51,7 +51,7 @@ export async function employeeUpdateNewWork(req, res) {
         await dbEmp.collection("data").insertOne({
           empCode: code,
           MonDate: weekToBeDisplayed,
-          data: `http://localhost:8000/api/fetch/employee/data/row/${code}/${weekToBeDisplayed}`,
+          data: `https://accelbi-backend.onrender.com//api/fetch/employee/data/row/${code}/${weekToBeDisplayed}`,
           submitted: null,
           submittedDate: null,
           approved: null,
@@ -358,7 +358,7 @@ export async function sendToMan(req, res) {
         .findOne({ code: empCode });
       }
 
-      const linkOfReview = `http://localhost:8000/api/fetch/manDisplayReview/${empCode}/${MonDate}`;
+      const linkOfReview = `https://accelbi-backend.onrender.com//api/fetch/manDisplayReview/${empCode}/${MonDate}`;
 
 
       await dbMan
