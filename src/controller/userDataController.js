@@ -99,12 +99,14 @@ export async function checkWhetherExist(req, res) {
 export async function checkWhetherManagerExist(req, res) {
   const {  manCode } = req.body;
   databaseconnect().then(async () => {
-    
+    console.log(manCode);
     const response = await dbSuper.collection("manager").findOne( { code:manCode } );
     
     if (response){
+      console.log("TRUE");
       res.json(true);
     } else {
+      console.log("FALSE");
       res.json(false);
     }
 

@@ -1,4 +1,5 @@
 import e from "express";
+import bcrypt from "bcrypt";
 import {dbEmp , dbUser ,dbMan, databaseconnect, dbSuper} from "../config/databaseConfig.js";
 export async function employee(req,res){
     const { id } = req.params;
@@ -233,3 +234,15 @@ export async function employeeRowData(req, res) {
     .catch(console.error);
 }
 
+export async function checkSupPass(req, res) {
+  const { pass , email } = req.params;
+  databaseconnect().then(async () => {
+    const response = await dbUser.collection("data").findOne({ position: "super", email: email });
+    if (response){
+      const match = await bcrypt.compare(pass, response.encrypted);
+      res.status(200).json(match);
+    } else {
+      res.status(404).json("Not Found");
+    }
+  });
+}

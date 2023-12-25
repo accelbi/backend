@@ -1,6 +1,15 @@
+import bcrypt from "bcrypt";
 
-import { readFileSync } from 'fs';
+const secret = "a";
+const salt = bcrypt.genSaltSync(10, secret);
 
-const credentials = JSON.parse(readFileSync('./credentials.json', 'utf8'));
+const password = "Accelbi@2022";
+const hash = bcrypt.hashSync(password, salt);
+console.log(hash);
 
-console.log(credentials);
+
+// const salt = bcrypt.genSaltSync(1000, "aasdcscsfdszcs");
+// const password = "Accelbi@2022";
+
+const result = bcrypt.compareSync(password, hash)
+console.log(result);

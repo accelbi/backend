@@ -1,7 +1,8 @@
 import express from "express";
-import { employee,manReview,manDisplayReview,superVerification,employeeData,employeeRowData,getGeneralData,getSpecificData } from "../controller/fetchDataController.js"
+import { employee,manReview,manDisplayReview,superVerification,employeeData,employeeRowData,getGeneralData,getSpecificData,checkSupPass } from "../controller/fetchDataController.js"
 const fetchDataRouter = express.Router();
 
+fetchDataRouter.get("/checkSupPass/:pass/:email", checkSupPass)
 fetchDataRouter.get("/employee/:id", employee)
 fetchDataRouter.get("/employee/data/:code/:weekToBeDisplayed", employeeData)
 fetchDataRouter.get("/employee/data/row/:code/:weekToBeDisplayed", employeeRowData)

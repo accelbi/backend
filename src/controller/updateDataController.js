@@ -51,7 +51,7 @@ export async function employeeUpdateNewWork(req, res) {
         await dbEmp.collection("data").insertOne({
           empCode: code,
           MonDate: weekToBeDisplayed,
-          data: `https://accelbi-backend.onrender.com//api/fetch/employee/data/row/${code}/${weekToBeDisplayed}`,
+          data: `https://accelbi-backend.onrender.com/api/fetch/employee/data/row/${code}/${weekToBeDisplayed}`,
           submitted: null,
           submittedDate: null,
           approved: null,
@@ -156,7 +156,7 @@ export async function addBySuper(req, res) {
       await dbSuper.collection(`${position}`).insertOne(data2);
       }
 
-      res.send("addedToSuper");
+      res.status(200).json({succes:true , message:"Added"});
     })
     .catch(console.error);
 }
@@ -358,7 +358,7 @@ export async function sendToMan(req, res) {
         .findOne({ code: empCode });
       }
 
-      const linkOfReview = `https://accelbi-backend.onrender.com//api/fetch/manDisplayReview/${empCode}/${MonDate}`;
+      const linkOfReview = `https://accelbi-backend.onrender.com/api/fetch/manDisplayReview/${empCode}/${MonDate}`;
 
 
       await dbMan
@@ -377,12 +377,16 @@ export async function sendToMan(req, res) {
           totalHours: totalHours,
           review: linkOfReview,
         });
-      console.log("sentToMan");
-      res.send("sentToMan");
+      
       }
+      res.status(200).json({
+        success : true
+      })
     })
     
-    .catch(console.error);
+    .catch(console.error)
+      
+    
 }
 export async function unSubmit(req, res) {
   const { empCode, manCode, date , MonDate} = req.params;
@@ -470,8 +474,13 @@ export async function addManToManBySuper(req, res) {
             manEmail: response.email,
           },
         });
+
+        res.status(200).json({
+          success : true
+        })
       } else {
         res.status(200).json({
+          success : false,
           error : "Manager not found"
         })
       }
