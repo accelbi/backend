@@ -1,5 +1,5 @@
 import express from "express";
-import { employee,manager,editBySuper,addBySuper,sendToMan,managerAccount,deleteBySuper,employeeUpdateData,applyLeave,employeeUpdateWork,employeeUpdateNewWork,cancelAppliedLeave,unSubmit,approve,reject,addManToManBySuper } from "../controller/updateDataController.js"
+import { employee,manager,editBySuper,addBySuper,sendToMan,managerAccount,deleteBySuper,employeeUpdateData,applyLeave,employeeUpdateWork,employeeUpdateNewWork,cancelAppliedLeave,unSubmit,approve,reject,addManToManBySuper,changeImage } from "../controller/updateDataController.js"
 const updateDataRouter = express.Router();
 
 
@@ -24,5 +24,6 @@ updateDataRouter.post("/unSubmit/:empCode/:manCode/:MonDate/:date", unSubmit)
 
 updateDataRouter.post("/manager/approve/:empCode/:manCode/:MonDate/:date", approve)
 updateDataRouter.post("/manager/reject/:empCode/:manCode/:MonDate/:date", reject)
+updateDataRouter.post("/changeImage", changeImage)
 
 export default updateDataRouter;

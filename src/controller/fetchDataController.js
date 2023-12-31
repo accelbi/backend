@@ -246,3 +246,14 @@ export async function checkSupPass(req, res) {
     }
   });
 }
+export async function lastWeek(req, res) {
+  const { manCode , date , code } = req.query;
+  databaseconnect().then(async () => {
+    const response = await dbMan.collection("empTSreq").findOne({  manCode:manCode , MonDate:date , code:code });
+    if (response){
+      res.status(200).json({found:true , url:response.url});
+    } else {
+      res.status(200).json({found:false , url:""});
+    }
+  });
+}

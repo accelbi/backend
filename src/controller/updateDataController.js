@@ -51,7 +51,7 @@ export async function employeeUpdateNewWork(req, res) {
         await dbEmp.collection("data").insertOne({
           empCode: code,
           MonDate: weekToBeDisplayed,
-          data: `https://accelbi-backend.onrender.com/api/fetch/employee/data/row/${code}/${weekToBeDisplayed}`,
+          data: `http://localhost:8000/api/fetch/employee/data/row/${code}/${weekToBeDisplayed}`,
           submitted: null,
           submittedDate: null,
           approved: null,
@@ -176,35 +176,56 @@ export async function managerAccount(req, res) {
 export async function applyLeave(req, res) {
   const { code, weekToBeDisplayed } = req.params;
   const { date, reason, type } = req.body;
-  databaseconnect()
-    .then(async () => {
-      let index;
-      const response = await dbEmp
-        .collection("data")
-        .findOne({ empCode: code, MonDate: weekToBeDisplayed });
 
-      if (!response.leave) {
-        response.leave = [];
+  try {
+    await databaseconnect();
+
+    // Fetch the employee data once
+    const response = await dbEmp
+      .collection("data")
+      .findOne({ empCode: code, MonDate: weekToBeDisplayed });
+
+    if (!response.leave) {
+      response.leave = [];
+    }
+
+    // Use Promise.all to wait for all async operations to complete
+    await Promise.all(date.map(async (item) => {
+      // Check if leave for the date already exists
+      const leaveIndex = response.leave.findIndex((leave) => leave.date === item);
+
+      if (leaveIndex === -1) {
+        // Leave for the date doesn't exist, so add it
+        response.leave.push({
+          date: item,
+          reason: reason,
+          type: type,
+        });
+      } else {
+        // Leave for the date exists, so update it
+        response.leave[leaveIndex] = {
+          date: item,
+          reason: reason,
+          type: type,
+        };
       }
-      if (response.leave.date !== date) {
-      response.leave.push({
-        date: date,
-        reason: reason,
-        type: type,
-      });
-      }
+
+      // Update the database for each date
       await dbEmp
         .collection("data")
         .updateOne(
           { empCode: code, MonDate: weekToBeDisplayed },
           { $set: { leave: response.leave } }
         );
+    }));
 
-      res.send("Updated Emp Data");
-      console.log("Updated Emp Data");
-    })
-    .catch(console.error);
+    res.send("Updated Emp Data");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
 }
+
 
 export async function cancelAppliedLeave(req, res) {
   const { code, weekToBeDisplayed } = req.params;
@@ -358,7 +379,7 @@ export async function sendToMan(req, res) {
         .findOne({ code: empCode });
       }
 
-      const linkOfReview = `https://accelbi-backend.onrender.com/api/fetch/manDisplayReview/${empCode}/${MonDate}`;
+      const linkOfReview = `http://localhost:8000/api/fetch/manDisplayReview/${empCode}/${MonDate}`;
 
 
       await dbMan
@@ -430,19 +451,19 @@ export async function reject(req, res) {
   console.log(manCode);
   console.log(MonDate);
   databaseconnect()
-    .then(async () => {
-      await dbMan
+  .then(async () => {
+    await dbMan
         .collection("empTSreq")
         .updateOne({ code: empCode, manCode: manCode, MonDate: MonDate } , {
           $set: { status: "rejected" },
         });
       await dbEmp
-        .collection("data")
+      .collection("data")
         .updateOne(
           { empCode: empCode, MonDate: MonDate },
           { $set: { approved: false, approvedDate: date , reason: reason } }
-        );
-    })
+          );
+        })
     .catch(console.error);
 }
 export async function addManToManBySuper(req, res) {
@@ -450,20 +471,20 @@ export async function addManToManBySuper(req, res) {
   const { manCode } = req.body;
   
   databaseconnect()
-    .then(async () => {
+  .then(async () => {
 
-      const response = await dbSuper
+    const response = await dbSuper
         .collection("manager")
         .findOne({ code: manCode });
 
       if (response){
-      await dbSuper
+        await dbSuper
         .collection("manager")
         .updateOne({ code: code } , {
           $set: { manCode: manCode },
         });
 
-      await dbUser
+        await dbUser
         .collection("data")
         .updateOne({ code: code } , {
           $set: { 
@@ -474,7 +495,7 @@ export async function addManToManBySuper(req, res) {
             manEmail: response.email,
           },
         });
-
+        
         res.status(200).json({
           success : true
         })
@@ -489,3 +510,43 @@ export async function addManToManBySuper(req, res) {
     .catch(console.error);
 }
 
+export async function changeImage(req, res) {
+  const { code , position , image_b , image_m , image_s } = req.body;
+  console.log(code , position , image_b , image_m , image_s);
+  databaseconnect()
+    .then(async () => {
+      await dbUser
+        .collection("data")
+        .updateOne({ code: code, position:position } , {
+          $set: { image_b: image_b ,
+                  image_m: image_m ,
+                  image_s: image_s ,
+                },  
+        });
+      if (position === "employee"){
+      await dbSuper
+        .collection("employee")
+        .updateOne(
+          { code: code },
+          { $set: { image_b: image_b ,
+                    image_m: image_m ,
+                    image_s: image_s ,
+                  },   }
+        );
+      } else if (position === "manager"){
+        await dbSuper
+        .collection("manager")
+        .updateOne(
+          { code: code },
+          { $set: { image_b: image_b ,
+                    image_m: image_m ,
+                    image_s: image_s ,
+                  },   }
+        );
+      }
+      res.status(200).json({
+        success : true
+      })
+    })
+    .catch(console.error);
+}
