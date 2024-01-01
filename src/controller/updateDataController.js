@@ -128,9 +128,13 @@ export async function deleteBySuper(req, res) {
       if (position === "employee") {
         await dbUser.collection("data").deleteOne({ empCode: code });
         await dbEmp.collection("data").deleteMany({ empCode: code });
+        await dbEmp.collection("work").deleteMany({ empCode: code });
+        await dbMan.collection("empTSreq").deleteMany({ code: code });
       } else if (position === "manager") {
         await dbUser.collection("data").deleteOne({ code: code });
-        await dbMan.collection("empTSreq").deleteMany({ code: code });
+        await dbEmp.collection("data").deleteMany({ empCode: code });
+        await dbEmp.collection("work").deleteMany({ empCode: code });
+        await dbMan.collection("empTSreq").deleteMany({ manCode: code });
       }
 
       res.send("deleted");
