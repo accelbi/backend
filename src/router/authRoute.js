@@ -1,8 +1,8 @@
 import express from "express";
-import {signup , signin} from "../controller/authController.js"
+import {toMan , toEmp} from "../controller/authController.js"
 const authRouter = express.Router();
 
-authRouter.post("/signup", signup)
-authRouter.post("/signin", signin)
+authRouter.post("/toMan", toMan) // https://accelbi-backend.onrender.com/api/auth/toMan
+authRouter.post("/toEmp", toEmp) // https://accelbi-backend.onrender.com/api/auth/toEmp
 
 export default authRouter;

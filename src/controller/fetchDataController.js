@@ -6,8 +6,8 @@ export async function employee(req,res){
     const {date} = req ;
     databaseconnect().then(async() => {
         const response = await dbEmp.collection("data").findOne({ empCode : id , MonDate:date});
-        console.log(date);
-        console.log(id);
+        // console.log(date);
+        // console.log(id);
     res.json(response);
     }).catch(console.error);
     
@@ -34,7 +34,7 @@ function getThisWeekDatesArray(mondayDate) {
 export async function manReview(req,res){
     const { code , MonDate} = req.params;
     const arr  = getThisWeekDatesArray(MonDate);
-    console.log(arr);
+    // console.log(arr);
     let response2 = [];
     databaseconnect().then(async() => {
         const responses = await Promise.all(
@@ -53,7 +53,7 @@ export async function manReview(req,res){
 
 export async function getGeneralData(req,res){
     const { dates , manCode} = req.body;
-    console.log(dates);
+    // console.log(dates);
     let response2 = [];
     let response3 = [];
     databaseconnect().then(async() => {
@@ -104,9 +104,9 @@ export async function getGeneralData(req,res){
 
 export async function getSpecificData(req,res){
     const { dates , manCode , code} = req.body;
-    console.log(dates);
-    console.log(manCode);
-    console.log(code);
+    // console.log(dates);
+    // console.log(manCode);
+    // console.log(code);
     let response2 = [];
     let response3 = [];
     databaseconnect().then(async() => {
@@ -151,7 +151,7 @@ export async function getSpecificData(req,res){
               }]);
             })
           );
-        console.log(response2);
+        // console.log(response2);
         res.json({data:response2 , dates:response3});
     }).catch(console.error);
 }
@@ -169,10 +169,10 @@ export async function manDisplayReview(req,res){
             empCode: code,
             MonDate: MonDate,
           })
-        console.log(code)
-        console.log(MonDate , "MonDate")
-        console.log(response1)
-        console.log(response)
+        // console.log(code)
+        // console.log(MonDate , "MonDate")
+        // console.log(response1)
+        // console.log(response)
         const result = {
             code : code,
             subDate : response1.submittedDate,
@@ -189,10 +189,10 @@ export async function manDisplayReview(req,res){
 
 export async function superVerification(req,res){
     const { code , email , manCode } = req.query;
-    console.log(req.query);
-    console.log( "code" , code);
-    console.log("email" , email);
-    console.log("manCode" , manCode);
+    // console.log(req.query);
+    // console.log( "code" , code);
+    // console.log("email" , email);
+    // console.log("manCode" , manCode);
     databaseconnect().then(async() => {
         const response = await dbSuper.collection("employee").findOne({
             code,
@@ -200,10 +200,10 @@ export async function superVerification(req,res){
             email,
           })
         if (response){
-          console.log("true");
+          // console.log("true");
           res.json(true);
         } else {
-          console.log("false");
+          // console.log("false");
           res.json(false);
         }
         

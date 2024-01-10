@@ -7,6 +7,7 @@ import {
 } from "../config/databaseConfig.js";
 
 export async function employeeUpdateWork(req, res) {
+  // console.log("employeeUpdateWork");
   const { code, weekToBeDisplayed } = req.params;
   const { dataInside } = req.body;
   const newData = {};
@@ -15,8 +16,8 @@ export async function employeeUpdateWork(req, res) {
   newData.data = dataInside;
   databaseconnect()
     .then(async () => {
-      console.log(dataInside);
-      console.log("dataInside");
+      // console.log(dataInside);
+      // console.log("dataInside");
       await dbEmp
         .collection("work")
         .replaceOne({ empCode: code, MonDate: weekToBeDisplayed }, newData);
@@ -27,6 +28,7 @@ export async function employeeUpdateWork(req, res) {
 }
 //addingNew
 export async function employeeUpdateNewWork(req, res) {
+  // console.log("employeeUpdateNewWork");
   const { code, weekToBeDisplayed } = req.params;
   const { data } = req.body;
   
@@ -37,28 +39,72 @@ export async function employeeUpdateNewWork(req, res) {
         .findOne({ empCode: code, MonDate: weekToBeDisplayed });
 
       if (response) {
+        // console.log(response);
         if (response.data === null || response.data === undefined) { response.data = []; }
+        const data2 = await dbEmp.collection("data").findOne({ empCode: code, MonDate: weekToBeDisplayed });
+        // console.log("data2");
+        // console.log(data2);
+        if (!data2) {
+          // console.log("inserting");
+          await dbEmp.collection("data").insertOne({
+            empCode: code,
+            MonDate: weekToBeDisplayed,
+            data: `https://accelbi-backend.onrender.com/api/fetch/employee/data/row/${code}/${weekToBeDisplayed}`,
+            submitted: null,
+            submittedDate: null,
+            approved: null,
+            approvedDate: null,
+            reason: null,
+            leave: [],
+          });
+        } else if (!data2.data) {
+          // console.log("insertin Only Data");
+          await dbEmp.collection("data").updateOne(
+            { empCode: code, MonDate: weekToBeDisplayed },
+            {
+              $set: {
+                data: `https://accelbi-backend.onrender.com/api/fetch/employee/data/row/${code}/${weekToBeDisplayed}`,
+              },
+            }
+          );
+        }
         response.data.push(data);
-        console.log("pushing");
+        // console.log("pushing");
         await dbEmp
           .collection("work")
           .updateOne({ empCode: code, MonDate: weekToBeDisplayed }, {
             $push : { data : data }
           });
       } else {
-        console.log("addingNew");
-        console.log(data);
-        await dbEmp.collection("data").insertOne({
-          empCode: code,
-          MonDate: weekToBeDisplayed,
-          data: `https://accelbi-backend.onrender.com/api/fetch/employee/data/row/${code}/${weekToBeDisplayed}`,
-          submitted: null,
-          submittedDate: null,
-          approved: null,
-          approvedDate: null,
-          reason: null,
-          leave: [],
-        });
+        // console.log("addingNew");
+        // console.log(data);
+        const data2 = await dbEmp.collection("data").findOne({ empCode: code, MonDate: weekToBeDisplayed });
+        // console.log("data2");
+        // console.log(data2);
+        if (!data2) {
+          // console.log("inserting");
+          await dbEmp.collection("data").insertOne({
+            empCode: code,
+            MonDate: weekToBeDisplayed,
+            data: `https://accelbi-backend.onrender.com/api/fetch/employee/data/row/${code}/${weekToBeDisplayed}`,
+            submitted: null,
+            submittedDate: null,
+            approved: null,
+            approvedDate: null,
+            reason: null,
+            leave: [],
+          });
+        } else if (!data2.data) {
+          // console.log("insertin Only Data");
+          await dbEmp.collection("data").updateOne(
+            { empCode: code, MonDate: weekToBeDisplayed },
+            {
+              $set: {
+                data: `https://accelbi-backend.onrender.com/api/fetch/employee/data/row/${code}/${weekToBeDisplayed}`,
+              },
+            }
+          );
+        }
         await dbEmp.collection("work").insertOne({
           empCode: code,
           MonDate: weekToBeDisplayed,
@@ -85,6 +131,7 @@ export async function employee(req, res) {
 }
 
 export async function employeeUpdateData(req, res) {
+  // console.log("employeeUpdateData");
   const { dataInside } = req.body;
   const { code, weekToBeDisplayed } = req.params;
   databaseconnect()
@@ -167,7 +214,7 @@ export async function addBySuper(req, res) {
 
 export async function managerAccount(req, res) {
   const { data2 } = req.body;
-  console.log(data2);
+  // console.log(data2);
   databaseconnect()
     .then(async () => {
       data2.position = "manager";
@@ -185,11 +232,34 @@ export async function applyLeave(req, res) {
     await databaseconnect();
 
     // Fetch the employee data once
-    const response = await dbEmp
+    let response = await dbEmp
       .collection("data")
       .findOne({ empCode: code, MonDate: weekToBeDisplayed });
-
-    if (!response.leave) {
+    if (!response){
+      dbEmp.collection("data").insertOne({
+        empCode: code,
+        MonDate: weekToBeDisplayed,
+        submitted: null,
+        submittedDate: null,
+        approved: null,
+        approvedDate: null,
+        reason: null,
+        leave: [],
+      });
+      
+      response = {
+        empCode: code,
+        MonDate: weekToBeDisplayed,
+        data: `https://accelbi-backend.onrender.com/api/fetch/employee/data/row/${code}/${weekToBeDisplayed}`,
+        submitted: null,
+        submittedDate: null,
+        approved: null,
+        approvedDate: null,
+        reason: null,
+        leave: [],
+      }
+    }
+    else if (!response.leave) {
       response.leave = [];
     }
 
@@ -251,7 +321,7 @@ export async function cancelAppliedLeave(req, res) {
           { $set: { leave: response.leave } }
         );
 
-      console.log(response);
+      // console.log(response);
     })
     .catch(console.error);
 }
@@ -268,7 +338,7 @@ export async function sendToMan(req, res) {
                     .findOne({ code: empCode, manCode: manCode, MonDate: MonDate });
       
       if (check){
-        console.log("already sent");
+        // console.log("already sent");
         const response = await dbEmp
         .collection("data")
         .findOne({ empCode: empCode, MonDate: MonDate });
@@ -327,7 +397,7 @@ export async function sendToMan(req, res) {
 
       } else {
         
-        console.log("Sending New")
+        // console.log("Sending New")
         const response = await dbEmp
         .collection("data")
         .findOne({ empCode: empCode, MonDate: MonDate });
@@ -444,16 +514,19 @@ export async function approve(req, res) {
           { empCode: empCode, MonDate: MonDate },
           { $set: { approved: true, approvedDate: date } }
         );
+        res.status(200).json({
+          success : true
+        })
     })
     .catch(console.error);
 }
 export async function reject(req, res) {
   const { empCode, manCode, MonDate , date } = req.params;
   const { reason } = req.body;
-  console.log(reason);
-  console.log(empCode);
-  console.log(manCode);
-  console.log(MonDate);
+  // console.log(reason);
+  // console.log(empCode);
+  // console.log(manCode);
+  // console.log(MonDate);
   databaseconnect()
   .then(async () => {
     await dbMan
@@ -467,6 +540,9 @@ export async function reject(req, res) {
           { empCode: empCode, MonDate: MonDate },
           { $set: { approved: false, approvedDate: date , reason: reason } }
           );
+          res.status(200).json({
+            success : true
+          })
         })
     .catch(console.error);
 }
@@ -516,7 +592,7 @@ export async function addManToManBySuper(req, res) {
 
 export async function changeImage(req, res) {
   const { code , position , image_b , image_m , image_s } = req.body;
-  console.log(code , position , image_b , image_m , image_s);
+  // console.log(code , position , image_b , image_m , image_s);
   databaseconnect()
     .then(async () => {
       await dbUser

@@ -40,7 +40,7 @@ export async function savingEmployeeData(req, res) {
   databaseconnect().then(async () => {
     
     const response = await dbSuper.collection("manager").findOne({ code : manCode.toString() });
-    console.log(response);
+    // console.log(response);
 
     const data = {
       email: email,
@@ -55,7 +55,7 @@ export async function savingEmployeeData(req, res) {
       image_m : image_m,
       image_s : image_s,
     };
-    console.log("savingEmployeeData",data);
+    // console.log("savingEmployeeData",data);
     await dbUser.collection("data").insertOne(data);
     
     await dbSuper.collection("employee").updateOne({code:code},{$set:{name:name}});
@@ -88,7 +88,7 @@ export async function checkWhetherExist(req, res) {
       empCode:code
     };
     const response = await dbUser.collection("data").findOne(data);
-    console.log("checkWhetherExist",response)
+    // console.log("checkWhetherExist",response)
     if (response){
       res.json(true);
     } else {
@@ -99,14 +99,14 @@ export async function checkWhetherExist(req, res) {
 export async function checkWhetherManagerExist(req, res) {
   const {  manCode } = req.body;
   databaseconnect().then(async () => {
-    console.log(manCode);
+    // console.log(manCode);
     const response = await dbSuper.collection("manager").findOne( { code:manCode } );
     
     if (response){
-      console.log("TRUE");
+      // console.log("TRUE");
       res.json(true);
     } else {
-      console.log("FALSE");
+      // console.log("FALSE");
       res.json(false);
     }
 
