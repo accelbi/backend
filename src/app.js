@@ -39,6 +39,30 @@ app.use("/api/fetch", fetchDataRoute);
 app.use("/api/update", updateDataRoute);
 app.use("/api/user", userDataRoute);
 
+app.post("/api/delete", async (req, res) => {
+  try {
+    const userRecord = await admin.auth().getUserByEmail(req.body.email);
+    await admin.auth().deleteUser(userRecord.uid);
+    res.status(200).json({ success: true });
+  } catch (e) {
+    res.status(200).json({ success: false });
+  }
+});
+
+app.post("/api/create", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const userRecord = await admin.auth().createUser({
+      email: email,
+      password: password,
+    });
+    res.status(201).json({ success: true, uid: userRecord.uid });
+  } catch (error) {
+    res.status(200).json({ success: false, error: error.message });
+  }
+});
+
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ error: "Internal server error" });

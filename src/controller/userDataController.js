@@ -1,4 +1,4 @@
-import { dbUser, dbSuper, databaseconnect } from "../config/databaseConfig.js";
+import { dbUser, dbSuper , dbEmp , dbMan, databaseconnect } from "../config/databaseConfig.js";
 export async function data(req, res) {
   const { email } = req.params;
   databaseconnect().then(async () => {
@@ -40,7 +40,7 @@ export async function savingEmployeeData(req, res) {
   databaseconnect().then(async () => {
     
     const response = await dbSuper.collection("manager").findOne({ code : manCode.toString() });
-    console.log(response);
+    // console.log(response);
 
     const data = {
       email: email,
@@ -55,7 +55,7 @@ export async function savingEmployeeData(req, res) {
       image_m : image_m,
       image_s : image_s,
     };
-    console.log("savingEmployeeData",data);
+    // console.log("savingEmployeeData",data);
     await dbUser.collection("data").insertOne(data);
     
     await dbSuper.collection("employee").updateOne({code:code},{$set:{name:name}});
@@ -88,7 +88,7 @@ export async function checkWhetherExist(req, res) {
       empCode:code
     };
     const response = await dbUser.collection("data").findOne(data);
-    console.log("checkWhetherExist",response)
+    // console.log("checkWhetherExist",response)
     if (response){
       res.json(true);
     } else {
@@ -99,14 +99,14 @@ export async function checkWhetherExist(req, res) {
 export async function checkWhetherManagerExist(req, res) {
   const {  manCode } = req.body;
   databaseconnect().then(async () => {
-    console.log(manCode);
+    // console.log(manCode);
     const response = await dbSuper.collection("manager").findOne( { code:manCode } );
     
     if (response){
-      console.log("TRUE");
+      // console.log("TRUE");
       res.json(true);
     } else {
-      console.log("FALSE");
+      // console.log("FALSE");
       res.json(false);
     }
 
@@ -117,36 +117,92 @@ export async function editToUserData(req, res) {
   const { codeIn } = req.params;
   const { data2  } = req.body;
   databaseconnect().then(async () => {
-    const response = await dbUser.collection("data").findOne({ code: codeIn.toString() });
-    const response1 = await dbUser.collection("data").findOne({ empCode: codeIn.toString() });
-    if (response) {
+    // const response = await dbUser.collection("data").findOne({ code: codeIn.toString() });
+    // const response1 = await dbUser.collection("data").findOne({ empCode: codeIn.toString() });
+    // if (response) {
 
-      await dbUser.collection("data").updateOne({ code: codeIn.toString() }, {
-        $set: {
-          name: data2.name,
-          phone: data2.phone,
-        },
-      });
+    //   await dbUser.collection("data").updateOne({ code: codeIn.toString() }, {
+    //     $set: {
+    //       code: data2.code,
+    //       name: data2.name,
+    //       phone: data2.phone,
+    //     },
+    //   });
 
-      await dbUser.collection("data").updateMany({ manCode: codeIn.toString() }, {
-        $set: {
-          manName: data2.name,
-          manPhone: data2.phone,
-        },
-      });
+    //   await dbUser.collection("data").updateMany({ manCode: codeIn.toString() }, {
+    //     $set: {
+    //       manCode: data2.code,
+    //       manName: data2.name,
+    //       manPhone: data2.phone,
+    //     },
+    //   });
 
-      res.sendStatus(200);
-    } else if (response1) {
+    //   res.sendStatus(200);
+    // } 
+    // if (response1) {
 
-      await dbUser.collection("data").updateOne({ empCode: codeIn.toString() }, {
-        $set: {
-          name: data2.name,
-          phone: data2.phone,
-        },
-      });
+    //   await dbUser.collection("data").updateOne({ empCode: codeIn.toString() }, {
+    //     $set: {
+    //       name: data2.name,
+    //       phone: data2.phone,
+    //       empCode: data2.code,
+    //     },
+    //   });
       
 
-      res.sendStatus(200);
-    }
+    //   res.sendStatus(200);
+    // }
+
+
+    await dbUser.collection("data").updateOne({ code: codeIn.toString() }, {
+      $set: {
+        email: data2.email,
+        code: data2.code,
+        name: data2.name,
+        phone: data2.phone,
+      },
+    });
+
+    await dbUser.collection("data").updateMany({ manCode: codeIn.toString() }, {
+      $set: {
+        manCode: data2.code,
+        manName: data2.name,
+        manPhone: data2.phone,
+        manEmail: data2.email,
+      },
+    });
+
+    await dbUser.collection("data").updateOne({ empCode: codeIn.toString() }, {
+      $set: {
+        empCode: data2.code,
+      },
+    });
+
+    await dbEmp.collection("data").updateMany({ empCode: codeIn.toString() }, {
+      $set:{
+        empCode: data2.code,
+      }
+    })
+
+    await dbEmp.collection("work").updateMany({ empCode: codeIn.toString() }, {
+      $set:{
+        empCode: data2.code,
+      }
+    })
+
+    await dbMan.collection("empTSreq").updateMany({ code: codeIn.toString() }, {
+      $set:{
+        code: data2.code
+      }
+    })
+
+    await dbMan.collection("empTSreq").updateMany({ manCode: codeIn.toString() }, {
+      $set:{
+        manCode: data2.code
+      }
+    })
+
+    res.sendStatus(200);
+
   });
 }

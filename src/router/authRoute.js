@@ -1,8 +1,8 @@
 import express from "express";
-import {signup , signin} from "../controller/authController.js"
+import {toMan , toEmp} from "../controller/authController.js"
 const authRouter = express.Router();
 
-authRouter.post("/signup", signup)
-authRouter.post("/signin", signin)
+authRouter.post("/toMan", toMan) // http://localhost:8000/api/auth/toMan
+authRouter.post("/toEmp", toEmp) // http://localhost:8000/api/auth/toEmp
 
 export default authRouter;

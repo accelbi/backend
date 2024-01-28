@@ -13,7 +13,7 @@ const databaseconnect = async () => {
         }
         if (!client && !client.isConnected()) {
             await client.connect();
-            console.log("Connected correctly to server");
+            // console.log("Connected correctly to server");
         }
 
         dbEmp = client.db("userEmp");
@@ -21,7 +21,7 @@ const databaseconnect = async () => {
         dbSuper = client.db("super");
         dbUser = client.db("user");
     } catch (err) {
-        console.log(err.stack);
+        // console.log(err.stack);
     }
 };
 
