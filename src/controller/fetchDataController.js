@@ -246,14 +246,68 @@ export async function checkSupPass(req, res) {
     }
   });
 }
-export async function lastWeek(req, res) {
-  const { manCode , date , code } = req.query;
-  databaseconnect().then(async () => {
-    const response = await dbMan.collection("empTSreq").findOne({  manCode:manCode , MonDate:date , code:code });
-    if (response){
-      res.status(200).json({found:true , url:response.url});
-    } else {
-      res.status(200).json({found:false , url:""});
-    }
-  });
+function getWeekDates(mondayDate) {
+  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+  const startDate = new Date(mondayDate);
+  const weekDates = [];
+
+  for (let i = 0; i < 7; i++) {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(startDate.getDate() + i);
+    weekDates.push(formatDate(currentDate));
+  }
+
+  return weekDates;
 }
+
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+export async function lastWeek(req, res) {
+  const { manCode, date, type , code } = req.query;
+  console.log(date);
+  const weekDays = getWeekDates(date);
+  console.log(weekDays);
+  try {
+    await databaseconnect();
+    if (type === "General"){
+    const cursor = dbMan.collection("empTSreq").find({ 
+      manCode: manCode,
+      subDate: { $in: weekDays }
+    });
+    const responseArray = await cursor.toArray();
+
+    console.log(responseArray);
+
+    if (responseArray.length > 0) {
+      res.status(200).json({ found: true, data: responseArray });
+    } else {
+      res.status(200).json({ found: false, url: "" });
+    }
+    } else {
+      const cursor = dbMan.collection("empTSreq").find({ 
+        manCode: manCode,
+        subDate: { $in: weekDays },
+        code : req.query.code
+      });
+      const responseArray = await cursor.toArray();
+  
+      console.log(responseArray);
+  
+      if (responseArray.length > 0) {
+        res.status(200).json({ found: true, data: responseArray });
+      } else {
+        res.status(200).json({ found: false, url: "" });
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
