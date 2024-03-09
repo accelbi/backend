@@ -117,6 +117,35 @@ export async function employeeUpdateNewWork(req, res) {
     .catch(console.error);
 }
 
+export async function deleteRow(req, res) {
+  const {code, weekToBeDisplayed, idx} = req.body;
+  databaseconnect()
+    .then(async () => {
+      const response = await dbEmp
+        .collection("work")
+        .findOne({ empCode: code, MonDate: weekToBeDisplayed });
+      // if response.data.length = 0;
+      // then delete the whole document from work and from data 
+      if (response.data.length === 1){
+        await dbEmp
+        .collection("work")
+        .deleteOne({ empCode: code, MonDate: weekToBeDisplayed });
+        await dbEmp
+        .collection("data")
+        .deleteOne({ empCode: code, MonDate: weekToBeDisplayed });
+        res.send("employeeUpdate");
+      }
+      response.data.splice(idx, 1);
+      await dbEmp
+        .collection("work")
+        .updateOne({ empCode: code, MonDate: weekToBeDisplayed }, {
+          $set : { data : response.data }
+        });
+      res.send("employeeUpdate");
+    })
+    .catch(console.error);
+}
+
 export async function employee(req, res) {
   const { id } = req.params;
   const { temp } = req.body;
@@ -510,6 +539,9 @@ export async function unSubmit(req, res) {
           { empCode: empCode, MonDate: MonDate },
           { $set: { submitted: false, submittedDate: null } }
         );
+        res.status(200).json({
+          success : true
+        })
     })
     .catch(console.error);
 }

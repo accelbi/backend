@@ -1,7 +1,8 @@
 import express from "express";
-import { employee,manager,editBySuper,addBySuper,sendToMan,managerAccount,deleteBySuper,employeeUpdateData,applyLeave,employeeUpdateWork,employeeUpdateNewWork,cancelAppliedLeave,unSubmit,approve,reject,addManToManBySuper,changeImage } from "../controller/updateDataController.js"
+import { employee,manager,editBySuper,addBySuper,sendToMan,managerAccount,deleteBySuper,employeeUpdateData,applyLeave,employeeUpdateWork,employeeUpdateNewWork,cancelAppliedLeave,unSubmit,approve,reject,addManToManBySuper,changeImage,deleteRow } from "../controller/updateDataController.js"
 const updateDataRouter = express.Router();
 
+updateDataRouter.delete("/delete/work", deleteRow)
 
 updateDataRouter.post("/employee/:id", employee)
 updateDataRouter.post("/employee/data/row/:code/:weekToBeDisplayed/update", employeeUpdateData)
